@@ -1,4 +1,4 @@
-[![monitor_ui(https://github.com/monitor-api/monitor_ui/actions/workflows/dart.yml/badge.svg?branch=main)](https://github.com/monitor-api/monitor_ui/actions/workflows/dart.yml)
+[![Dart](https://github.com/monitor-api/monitor_ui/actions/workflows/dart.yml/badge.svg)](https://github.com/monitor-api/monitor_ui/actions/workflows/dart.yml)
 
 Displaying all api informations
 
