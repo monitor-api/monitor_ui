@@ -11,8 +11,30 @@ class DashboardPage extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(defaultPadding),
           child: Column(
-            children: const [
-              Header()
+            children: [
+              const Header(),
+              const SizedBox(height: defaultPadding),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.only(left: defaultPadding),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: defaultPadding,
+                          vertical: defaultPadding / 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: const BorderRadius.all(Radius.circular(10)),
+                          border: Border.all(color: Colors.white10),
+                        ),
+                      )
+                  )
+
+                ]
+              )
+
             ],
           ),
         )
