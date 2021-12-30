@@ -4,8 +4,8 @@ const primaryColor = Color(0xFF1A5CFF);
 const secondaryColor = Color(0xFF2A2D3E);
 const bgColor = Color(0xFF212332);
 
-const success = Color(0xFF46C93A);
-const danger = Color(0xFFFF4757);
-const warn = Color(0xFFFFBA02);
+const success = Color(0xFF4CAF50);
+const danger = Color(0xFFEF5A49);
+const warn = Color(0xFFF2A041);
 
 const defaultPadding = 16.0;
