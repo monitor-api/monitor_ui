@@ -11,7 +11,7 @@ class MainPage extends StatelessWidget {
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children:  const [
             Expanded(
               child: SideMenu(),
             ),

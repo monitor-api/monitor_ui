@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:monitor_ui/constants.dart';
 
 class Status extends StatelessWidget {
   final double itemWidth;
@@ -49,7 +48,7 @@ class Status extends StatelessWidget {
 
   Text statusText(int index, String param) => Text(
     '${entries[index][param]}',
-    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
     overflow: TextOverflow.ellipsis,
   );
 }
