@@ -3,7 +3,8 @@ import 'package:monitor_ui/pages/dashboard_page.dart';
 import 'package:monitor_ui/pages/side_menu.dart';
 
 class MainPage extends StatelessWidget {
-  const MainPage({Key? key}) : super(key: key);
+  final Widget test;
+  const MainPage({Key? key, required this.test}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -11,13 +12,13 @@ class MainPage extends StatelessWidget {
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children:  const [
-            Expanded(
+          children: [
+            const Expanded(
               child: SideMenu(),
             ),
             Expanded(
               flex: 5,
-              child: DashboardPage()
+              child: test
             )
           ],
         ),

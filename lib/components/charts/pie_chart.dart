@@ -45,17 +45,16 @@ class PieChartPage extends StatelessWidget {
   }
 }
 
-
-  List<PieChartSectionData> getData() => PieData.data
-      .mapIndexed((index, data) =>
-      PieChartSectionData(
-          color: data.color,
-          value: data.percent,
-          title: '${data.percent}%',
-          titleStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          )
-      )
-  ).toList();
+List<PieChartSectionData> getData() => PieData.data
+    .mapIndexed((index, data) =>
+    PieChartSectionData(
+        color: data.color,
+        value: data.percent,
+        title: '${data.percent}%',
+        titleStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        )
+    )
+).toList();

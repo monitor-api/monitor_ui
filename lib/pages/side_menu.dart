@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:monitor_ui/components/dev2/dev2_dashboard.dart';
 
 class SideMenu extends StatelessWidget {
   const SideMenu({
@@ -18,12 +19,16 @@ class SideMenu extends StatelessWidget {
             DrawerListTitle(
               title: "Environments",
               svgSrc: "icons/menu_dashboard.svg",
-              press: () {},
+              press: () {
+                Navigator.of(context).pushNamed('/');
+              },
             ),
             DrawerListTitle(
               title: "DEV1/DEV2",
               svgSrc: "icons/development_phase.svg",
-              press: () {},
+              press: () {
+                Navigator.of(context).pushNamed('/dev2');
+              },
             ),
             DrawerListTitle(
               title: "UAT/BCK",
@@ -58,7 +63,7 @@ class DrawerListTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       horizontalTitleGap: 0.0,
-      onTap: () {},
+      onTap: press,
       leading: SvgPicture.asset(
         svgSrc,
         color: Colors.white54,
