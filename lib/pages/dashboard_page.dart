@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monitor_ui/Utils.dart';
 import 'package:monitor_ui/components/charts/bar_chart.dart';
 import 'package:monitor_ui/components/charts/pie_chart.dart';
 import 'package:monitor_ui/components/status/status.dart';
@@ -25,12 +26,6 @@ class DashboardPage extends StatelessWidget {
     double statusItemWidth = statusContainerWidth / 4.5;
     double statusItemPadding = statusItemWidth / 7.0;
 
-    BoxDecoration boxDecorationWithBorder = BoxDecoration(
-      color: secondaryColor,
-      borderRadius: const BorderRadius.all(Radius.circular(10)),
-      border: Border.all(color: Colors.white10),
-    );
-
 
     return SafeArea(
         child: SingleChildScrollView(
@@ -46,7 +41,7 @@ class DashboardPage extends StatelessWidget {
                       padding: const EdgeInsets.all(defaultPadding),
                       width: statusContainerWidth,
                       height: statusContainerHeight,
-                      decoration: boxDecorationWithBorder,
+                      decoration: boxDecorationWithBorder(color: secondaryColor),
                       child: Status(entries: entries, itemWidth: statusItemWidth, itemPadding: statusItemPadding),
                     ),
                     Container(
@@ -54,7 +49,7 @@ class DashboardPage extends StatelessWidget {
                       margin: const EdgeInsets.only(left: defaultPadding),
                       height: statusContainerHeight,
                       width: chartContainerWidth,
-                      decoration: boxDecorationWithBorder,
+                      decoration: boxDecorationWithBorder(color: secondaryColor),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -64,14 +59,14 @@ class DashboardPage extends StatelessWidget {
                               Container(
                                 height: statusContainerHeight * 0.45,
                                 width: chartContainerWidth * 0.45,
-                                decoration: boxDecorationWithBorder,
+                                decoration: boxDecorationWithBorder(color: secondaryColor),
                                 child: PieChartPage(height: statusContainerHeight, width: chartContainerWidth),
 
                               ),
                               Container(
                                 height: statusContainerHeight * 0.45,
                                 width: chartContainerWidth * 0.45,
-                                decoration: boxDecorationWithBorder,
+                                decoration: boxDecorationWithBorder(color: secondaryColor),
                                 child: PieChartPage(height: statusContainerHeight, width: chartContainerWidth),
                               ),
                             ],
@@ -83,7 +78,7 @@ class DashboardPage extends StatelessWidget {
                                 height: statusContainerHeight* 0.45,
                                 width: chartContainerWidth* 0.965,
                                 padding: const EdgeInsets.fromLTRB(0, 24, 20, 0),
-                                decoration: boxDecorationWithBorder,
+                                decoration: boxDecorationWithBorder(color: secondaryColor),
                                 child: const BarChartPage(),
                               ),
                             ],
