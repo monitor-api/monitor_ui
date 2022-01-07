@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class Status extends StatelessWidget {
+class ListCard extends StatelessWidget {
   final double itemWidth;
   final double itemPadding;
 
   final List<Map<String, Object>> entries;
 
-  const Status({Key? key, required this.entries, required this.itemWidth, required this.itemPadding}) : super(key: key);
+  const ListCard({Key? key, required this.entries, required this.itemWidth, required this.itemPadding}) : super(key: key);
 
   @override Widget build(BuildContext context) => ListView.separated(
     padding: const EdgeInsets.only(top: 8, bottom: 8),

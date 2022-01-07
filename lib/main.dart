@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:monitor_ui/components/dev2/dev2_dashboard.dart';
-import 'package:monitor_ui/pages/dashboard_page.dart';
-import 'package:monitor_ui/pages/main_page.dart';
+import 'package:monitor_ui/pages/home/home.dart';
 
 import 'constants.dart';
 
@@ -19,19 +17,19 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
 
       debugShowCheckedModeBanner: false,
-      title: 'Monitoring apis',
+      title: 'Monitor',
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: bgColor,
-        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme)
-            .apply(bodyColor: Colors.white),
+        textTheme: textTheme(context),
         canvasColor: secondaryColor,
       ),
       onGenerateRoute: (settings) {
-        if (settings.name == "/") return PageRouteBuilder(pageBuilder: (_, __, ___) => const MainPage(test: DashboardPage()));
-        if (settings.name == "/dev2") return PageRouteBuilder(pageBuilder: (_, __, ___) => const MainPage(test: Dev2Dashboard()));
+        if (settings.name == "/") return PageRouteBuilder(pageBuilder: (_, __, ___) => const Home());
         return null; // TODO ADD 404 PAGE HERE
       },
     );
   }
+
+  TextTheme textTheme(BuildContext context) => GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).apply(bodyColor: Colors.white);
 }
 
