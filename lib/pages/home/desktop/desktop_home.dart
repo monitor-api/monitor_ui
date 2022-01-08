@@ -14,6 +14,8 @@ class DesktopHome extends StatefulWidget {
 }
 
 class _DesktopHomeState extends State<DesktopHome> {
+  bool isOnTop = false;
+  bool upTopText = false;
 
   final ScrollController _controller = ScrollController();
 
@@ -53,15 +55,33 @@ class _DesktopHomeState extends State<DesktopHome> {
     body: listView(),
   );
 
-  ListView listView() => ListView.separated(
-    itemCount: 50,
-    itemBuilder: (context, index) => Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [ sizedContent(context, cardCreator()) ],
-    ),
-    separatorBuilder: (BuildContext context, int index) => Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [ sizedContent(context, const Divider(height: 30)) ],
+  Widget listView() => NotificationListener<ScrollUpdateNotification>(
+    onNotification: (notification) {
+      if (notification.metrics.pixels != 0) {
+        if ((isOnTop == false || upTopText == false)) {
+          setState(() {
+            isOnTop = true;
+            upTopText = true;
+          });
+        }
+      } else if (isOnTop == true || upTopText == true) {
+        setState(() {
+          isOnTop = false;
+          upTopText = false;
+        });
+      }
+      return true;
+    },
+    child: ListView.separated(
+      itemCount: 50,
+      itemBuilder: (context, index) => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [ sizedContent(context, cardCreator()) ],
+      ),
+      separatorBuilder: (BuildContext context, int index) => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [ sizedContent(context, const Divider(height: 30)) ],
+      ),
     ),
   );
 
@@ -80,9 +100,16 @@ class _DesktopHomeState extends State<DesktopHome> {
     VoidCallback onPressed,
   ) => FloatingActionButton.extended(
     backgroundColor: secondaryColor,
-    onPressed: onPressed,
-    label: const Text('TOP'),
-    icon: Icon(icon),
+    onPressed: isOnTop ? onPressed : null,
+    label: AnimatedDefaultTextStyle(
+      child: const Text('TOP'),
+      style : upTopText ? const TextStyle(fontSize: 14) : const TextStyle(fontSize: 0.1),
+      duration: const Duration(milliseconds: 200),
+    ),
+    icon: Padding(
+      padding: const EdgeInsets.only(left: 10.0),
+      child: Icon(icon),
+    ),
   );
 
   DesktopCard cardCreator() => const DesktopCard(name: "EmobG", status: Status.up, environment: "DEV2", gitLink: "https://about.gitlab.com/");
