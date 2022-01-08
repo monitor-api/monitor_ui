@@ -102,12 +102,12 @@ class _DesktopHomeState extends State<DesktopHome> {
     backgroundColor: secondaryColor,
     onPressed: isOnTop ? onPressed : null,
     label: AnimatedDefaultTextStyle(
-      child: const Text('TOP'),
-      style : upTopText ? const TextStyle(fontSize: 14) : const TextStyle(fontSize: 0.1),
+      child: const Text('TOP  '),
+      style : upTopText ? const TextStyle(fontSize: 17, fontWeight: FontWeight.w600) : const TextStyle(fontSize: 0.1),
       duration: const Duration(milliseconds: 200),
     ),
     icon: Padding(
-      padding: const EdgeInsets.only(left: 10.0),
+      padding: const EdgeInsets.only(left: 10.0, bottom: 3),
       child: Icon(icon),
     ),
   );
