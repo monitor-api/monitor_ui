@@ -46,8 +46,8 @@ class _DesktopHomeState extends State<DesktopHome> {
       backgroundColor: bgColor,
       title: DesktopHeader(),
       floating: true,
-      expandedHeight: 140,
-      toolbarHeight: 60,
+      expandedHeight: 100,
+      toolbarHeight: 63,
       stretch: true,
     )],
     body: listView(),
@@ -76,12 +76,13 @@ class _DesktopHomeState extends State<DesktopHome> {
   );
 
   FloatingActionButton actionButton(
-      IconData icon,
-      VoidCallback onPressed,
-  ) => FloatingActionButton.small(
+    IconData icon,
+    VoidCallback onPressed,
+  ) => FloatingActionButton.extended(
     backgroundColor: secondaryColor,
     onPressed: onPressed,
-    child: Icon(icon),
+    label: const Text('TOP'),
+    icon: Icon(icon),
   );
 
   DesktopCard cardCreator() => const DesktopCard(name: "EmobG", status: Status.up, environment: "DEV2", gitLink: "https://about.gitlab.com/");
