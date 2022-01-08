@@ -1,3 +1,5 @@
+import 'package:monitor_ui/data/enums/icon.dart';
+import 'package:monitor_ui/responsive.dart';
 import 'package:universal_html/html.dart';
 import 'package:flutter/material.dart';
 import 'package:monitor_ui/constants.dart';
@@ -27,44 +29,93 @@ class _DesktopCardState extends State<DesktopCard> {
   late Color gitLinkColor = Colors.white;
 
   @override Widget build(BuildContext context) => Container(
-      width: double.infinity,
       height: 200,
       decoration: boxDecoration(),
       child: content()
   );
 
-  ElevatedButton content() => ElevatedButton(
-    style: ButtonStyle(
-      shadowColor: MaterialStateProperty.all(Colors.transparent),
-      backgroundColor: MaterialStateProperty.all(Colors.transparent),
-    ),
-    onPressed: () {  },
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.only(top: 20, left: 20),
-          alignment: Alignment.topLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  Widget content() => SizedBox(
+    width: Responsive.width(context) / 2.1,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        shadowColor: Colors.transparent,
+        primary: Colors.transparent,
+      ),
+      onPressed: () {  },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          leftSide(),
+          Column(
             children: [
-              Text(widget.name, style: const TextStyle(fontWeight: FontWeight.bold)),
               heightSpacer,
-              status(),
+              Row(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    padding: const EdgeInsets.all(8),
+                    decoration: boxDecoration(defaultColor: warn),
+                    child: Image.network(IconMetric.diskSpace.url),
+                  ),
+                  widthSpacer,
+                  Container(
+                    width: 70,
+                    height: 70,
+                    padding: const EdgeInsets.all(8),
+                    decoration: boxDecoration(defaultColor: danger),
+                    child: Image.network(IconMetric.mongo.url),
+                  )
+                ],
+              ),
               heightSpacer,
-              environment(),
-              heightSpacer,
-              gitLink()
-              ],
+              Row(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    padding: const EdgeInsets.all(8),
+                    decoration: boxDecoration(defaultColor: danger),
+                    child: Image.network(IconMetric.mail.url),
+                  ),
+                  widthSpacer,
+                  Container(
+                    width: 70,
+                    height: 70,
+                    padding: const EdgeInsets.all(8),
+                    decoration: boxDecoration(defaultColor: success),
+                    child: Image.network(IconMetric.ping.url),
+                  )
+                ],
+              )
+            ],
           )
-        ),
-      ],
+        ],
+      ),
     ),
   );
 
-  BoxDecoration boxDecoration() => BoxDecoration(
-    color: secondaryColor,
-    borderRadius: const BorderRadius.all(Radius.circular(15)),
+  Container leftSide() => Container(
+      padding: const EdgeInsets.only(top: 20, left: 20),
+      alignment: Alignment.topLeft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+          heightSpacer,
+          status(),
+          heightSpacer,
+          environment(),
+          heightSpacer,
+          gitLink()
+        ],
+      )
+  );
+
+  BoxDecoration boxDecoration({ Color defaultColor = secondaryColor}) => BoxDecoration(
+    color: defaultColor,
+    borderRadius: const BorderRadius.all(Radius.circular(10)),
     border: Border.all(color: Colors.transparent),
   );
 
@@ -80,15 +131,26 @@ class _DesktopCardState extends State<DesktopCard> {
         focusColor: Colors.transparent,
         onHover: (isHovered) { setState(() => isHovered ? gitLinkColor = primaryColor : gitLinkColor = Colors.white); },
         onTap: () => window.open(widget.gitLink, 'new tab'),
-        child: Text(
-          widget.gitLink,
-          textAlign: TextAlign.left,
-          style: TextStyle(color: gitLinkColor),
-          overflow: TextOverflow.ellipsis,
+        child: SizedBox(
+          width: linkWidth(),
+          child: Text(
+            widget.gitLink,
+            textAlign: TextAlign.left,
+            style: TextStyle(color: gitLinkColor),
+            overflow: TextOverflow.ellipsis,
+
+          ),
         ),
       ),
     ],
   );
+
+  double linkWidth() {
+    if (widget.gitLink.length > (Responsive.width(context) / 5.1)) {
+      return Responsive.width(context) / 5.1;
+    }
+    return widget.gitLink.length * 8.5;
+  }
 
   Row environment() => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,9 +173,7 @@ class _DesktopCardState extends State<DesktopCard> {
           borderRadius: const BorderRadius.all(Radius.circular(10)),
           border: Border.all(color: Colors.white10),
         ),
-        child: Center(
-          child: Text(widget.status.name.toUpperCase()),
-        ),
+        child: Center(child: Text(widget.status.name.toUpperCase())),
       ),
     ],
   );

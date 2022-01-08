@@ -11,8 +11,8 @@ class DesktopHeader extends StatelessWidget {
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Container(
-        padding: const EdgeInsets.only(top: 100),
-        width: Responsive.width(context) / 2.2 ,
+        padding: const EdgeInsets.only(top: 10),
+        width: Responsive.width(context) / 2.1,
         child: const SearchField(),
       )
     ],

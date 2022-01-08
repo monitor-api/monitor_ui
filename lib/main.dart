@@ -15,12 +15,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       debugShowCheckedModeBanner: false,
       title: 'Monitor',
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: bgColor,
-        textTheme: textTheme(context),
+        textTheme: GoogleFonts.robotoMonoTextTheme(Theme.of(context).textTheme),
         canvasColor: secondaryColor,
       ),
       onGenerateRoute: (settings) {
@@ -29,7 +28,5 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-
-  TextTheme textTheme(BuildContext context) => GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).apply(bodyColor: Colors.white);
 }
 
