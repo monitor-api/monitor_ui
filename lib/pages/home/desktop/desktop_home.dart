@@ -20,6 +20,7 @@ class _DesktopHomeState extends State<DesktopHome> {
   final Duration periodicityOfCall = const Duration(seconds: 2);
 
   late final List<Map<String, dynamic>> envByValue;
+  late final List<Timer> timers;
 
   late Map<String, Api> apis = {};
   late Map<String, bool> callByApiName = {};
@@ -31,25 +32,32 @@ class _DesktopHomeState extends State<DesktopHome> {
     super.initState();
     List<dynamic> envApis = jsonDecode(const String.fromEnvironment("API", defaultValue: "[]"));
     envByValue = envApis.map((e) => e as Map<String, dynamic>).toList();
-    envByValue.forEach(toApi);
+    timers = envByValue.map(toApi).toList();
   }
 
-  void toApi(e) => Timer.periodic(periodicityOfCall, (timer) async {
+  Timer toApi(e) => Timer.periodic(periodicityOfCall, (timer) async {
     if (callByApiName[e["name"]] ?? false) return;
 
     setState(() => callByApiName[e["name"]] = true);
 
     String body = (await http.get(Uri.parse(e["path"] + "/health"), headers: { "Accept": "application/json" }).timeout(const Duration(minutes: 10))).body;
 
-    setState(() => callByApiName[e["name"]] = false);
+    if (mounted) setState(() => callByApiName[e["name"]] = false);
 
     Map<String, dynamic> keyValue = jsonDecode(body);
     Map<String, dynamic> componentKeyValue = keyValue["components"] ?? {};
 
     Map<String, String> statusByComponent = { for (var e in componentKeyValue.keys) e : componentKeyValue[e]["status"] } ;
 
-    setState(() => apis[e["name"]] = apiCreator(e, keyValue["status"], statusByComponent));
+    if (mounted) setState(() => apis[e["name"]] = apiCreator(e, keyValue["status"], statusByComponent));
   });
+
+  @override void dispose() {
+    super.dispose();
+    cancelTimers();
+  }
+
+  void cancelTimers() { for (var element in timers) { element.cancel(); } }
 
   Api apiCreator(e, String status, Map<String, String> componentKeyValue) => Api(
     name: e["name"],
@@ -91,7 +99,7 @@ class _DesktopHomeState extends State<DesktopHome> {
       title: DesktopHeader(),
       floating: true,
       expandedHeight: 100,
-      toolbarHeight: 63,
+      toolbarHeight: 53,
       stretch: true,
     )],
     body: listView(),
@@ -115,7 +123,7 @@ class _DesktopHomeState extends State<DesktopHome> {
       return true;
     },
     child: ListView.separated(
-      itemCount: apis.length,
+      itemCount: 50,
       itemBuilder: (context, index) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: apis.values.map((e) => sizedContent(context, cardCreator(e))).toList(),

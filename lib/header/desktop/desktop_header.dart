@@ -10,8 +10,8 @@ class DesktopHeader extends StatelessWidget {
   @override Widget build(BuildContext context) => Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      Container(
-        padding: const EdgeInsets.only(top: 10),
+      SizedBox(
+        //padding: const EdgeInsets.only(top: 10),
         width: Responsive.width(context) / 2.1,
         child: const SearchField(),
       )

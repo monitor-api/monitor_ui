@@ -28,16 +28,6 @@ class _DesktopCardState extends State<DesktopCard> {
 
   late Color gitLinkColor = Colors.white;
 
-  // @override void initState() {
-  //   super.initState();
-  //   print("color: ${componentEntries[0]?.value}");
-  //   print("color: ${componentEntries[1]?.value}");
-  //   print("color: ${componentEntries[2]?.value}");
-  //   print("color: ${componentEntries[3]?.value}");
-  //   // print("name: ${widget.components}");
-  //   // print(componentEntries[0].key != null ? statusColor(widget.components[0]![0]) : Colors.transparent);
-  // }
-
   @override Widget build(BuildContext context) => Container(
       height: 200,
       decoration: boxDecoration(),
