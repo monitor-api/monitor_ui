@@ -17,7 +17,6 @@ class DesktopHome extends StatefulWidget {
 }
 
 class _DesktopHomeState extends State<DesktopHome> {
-  final int responseTimeOfHealth = 30;
   final Duration periodicityOfCall = const Duration(seconds: 2);
 
   late final List<Map<String, dynamic>> envByValue;
@@ -33,24 +32,32 @@ class _DesktopHomeState extends State<DesktopHome> {
     List<dynamic> envApis = jsonDecode(const String.fromEnvironment("API", defaultValue: "[]"));
     envByValue = envApis.map((e) => e as Map<String, dynamic>).toList();
     envByValue.forEach(toApi);
-    Timer.periodic(periodicityOfCall, (timer) async => envByValue.forEach(toApi));
   }
 
-  Future<void> toApi(e) async {
-
+  void toApi(e) => Timer.periodic(periodicityOfCall, (timer) async {
     if (callByApiName[e["name"]] ?? false) return;
 
     setState(() => callByApiName[e["name"]] = true);
 
-    String body = (await http.get(Uri.parse(e["path"] + "/health"), headers: { "Accept": "application/json" })).body;
+    String body = (await http.get(Uri.parse(e["path"] + "/health"), headers: { "Accept": "application/json" }).timeout(const Duration(minutes: 10))).body;
 
     setState(() => callByApiName[e["name"]] = false);
 
-    Map <String, dynamic> keyValue = jsonDecode(body);
-    setState(() {
-      apis[e["name"]] = Api(name: e["name"], status: keyValue["status"], environment: e["env"], gitLink: e["gitLink"]);
-    });
-  }
+    Map<String, dynamic> keyValue = jsonDecode(body);
+    Map<String, dynamic> componentKeyValue = keyValue["components"] ?? {};
+
+    Map<String, String> statusByComponent = { for (var e in componentKeyValue.keys) e : componentKeyValue[e]["status"] } ;
+
+    setState(() => apis[e["name"]] = apiCreator(e, keyValue["status"], statusByComponent));
+  });
+
+  Api apiCreator(e, String status, Map<String, String> componentKeyValue) => Api(
+    name: e["name"],
+    status: status,
+    environment: e["env"],
+    gitLink: e["gitLink"],
+    components: componentKeyValue
+  );
 
   final ScrollController _controller = ScrollController();
 
@@ -147,5 +154,5 @@ class _DesktopHomeState extends State<DesktopHome> {
     ),
   );
 
-  DesktopCard cardCreator(Api api) => DesktopCard(name: api.name, status: api.status, environment: api.environment, gitLink: api.gitLink);
+  DesktopCard cardCreator(Api api) => DesktopCard(name: api.name, status: api.status, environment: api.environment, gitLink: api.gitLink, components: api.components);
 }

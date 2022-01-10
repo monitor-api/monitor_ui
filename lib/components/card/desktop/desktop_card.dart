@@ -1,4 +1,3 @@
-import 'package:monitor_ui/data/enums/icon.dart';
 import 'package:monitor_ui/responsive.dart';
 import 'package:universal_html/html.dart';
 import 'package:flutter/material.dart';
@@ -9,13 +8,15 @@ class DesktopCard extends StatefulWidget {
   final String status;
   final String environment;
   final String gitLink;
+  final Map<String, String> components;
 
   const DesktopCard({
     Key? key,
     required this.name,
     required this.status,
     required this.environment,
-    required this.gitLink
+    required this.gitLink,
+    required this.components
   }) : super(key: key);
 
   @override State<DesktopCard> createState() => _DesktopCardState();
@@ -26,6 +27,16 @@ class _DesktopCardState extends State<DesktopCard> {
   final SizedBox widthSpacer = const SizedBox(width: 20);
 
   late Color gitLinkColor = Colors.white;
+
+  // @override void initState() {
+  //   super.initState();
+  //   print("color: ${componentEntries[0]?.value}");
+  //   print("color: ${componentEntries[1]?.value}");
+  //   print("color: ${componentEntries[2]?.value}");
+  //   print("color: ${componentEntries[3]?.value}");
+  //   // print("name: ${widget.components}");
+  //   // print(componentEntries[0].key != null ? statusColor(widget.components[0]![0]) : Colors.transparent);
+  // }
 
   @override Widget build(BuildContext context) => Container(
       height: 200,
@@ -55,16 +66,16 @@ class _DesktopCardState extends State<DesktopCard> {
                     width: 70,
                     height: 70,
                     padding: const EdgeInsets.all(8),
-                    decoration: boxDecoration(defaultColor: warn),
-                    child: Image.network(IconMetric.diskSpace.url),
+                    decoration: boxDecoration(defaultColor: statusColor(widget.components.entries.toList()[0]?.value)),
+                    child: Image.network(url(widget.components.entries.toList()[0]?.key)),
                   ),
                   widthSpacer,
                   Container(
                     width: 70,
                     height: 70,
                     padding: const EdgeInsets.all(8),
-                    decoration: boxDecoration(defaultColor: danger),
-                    child: Image.network(IconMetric.mongo.url),
+                    decoration: boxDecoration(defaultColor: statusColor(widget.components.entries.toList()[1]?.value)),
+                    child: Image.network(url(widget.components.entries.toList()[1]?.key)),
                   )
                 ],
               ),
@@ -75,16 +86,16 @@ class _DesktopCardState extends State<DesktopCard> {
                     width: 70,
                     height: 70,
                     padding: const EdgeInsets.all(8),
-                    decoration: boxDecoration(defaultColor: danger),
-                    child: Image.network(IconMetric.mail.url),
+                    decoration: boxDecoration(defaultColor: statusColor(widget.components.entries.toList()[2]?.value)),
+                    child: Image.network(url(widget.components.entries.toList()[2]?.key)),
                   ),
                   widthSpacer,
                   Container(
                     width: 70,
                     height: 70,
                     padding: const EdgeInsets.all(8),
-                    decoration: boxDecoration(defaultColor: success),
-                    child: Image.network(IconMetric.ping.url),
+                    decoration: boxDecoration(defaultColor: statusColor(widget.components.entries.toList()[3]?.value)),
+                    child: Image.network(url(widget.components.entries.toList()[3]?.key)),
                   )
                 ],
               )
@@ -112,7 +123,7 @@ class _DesktopCardState extends State<DesktopCard> {
       )
   );
 
-  BoxDecoration boxDecoration({ Color defaultColor = secondaryColor}) => BoxDecoration(
+  BoxDecoration boxDecoration({ Color defaultColor = secondaryColor }) => BoxDecoration(
     color: defaultColor,
     borderRadius: const BorderRadius.all(Radius.circular(10)),
     border: Border.all(color: Colors.transparent),
@@ -168,7 +179,7 @@ class _DesktopCardState extends State<DesktopCard> {
         height: 25,
         width: 70,
         decoration: BoxDecoration(
-          color: widget.status == "UP" ? success : danger,
+          color: statusColor(widget.status),
           borderRadius: const BorderRadius.all(Radius.circular(10)),
           border: Border.all(color: Colors.white10),
         ),
@@ -176,4 +187,16 @@ class _DesktopCardState extends State<DesktopCard> {
       ),
     ],
   );
+
+  Color statusColor(String? status) => status != null ? status == "UP" ? success : danger : Colors.transparent;
+
+  String url(String? name) {
+    switch (name) {
+      case "diskSpace": return "https://cdn-icons-png.flaticon.com/512/2291/2291956.png";
+      case "mail": return "https://cdn-icons-png.flaticon.com/512/3161/3161085.png";
+      case "mongo": return "https://cdn-icons-png.flaticon.com/512/1664/1664316.png";
+      case "ping": return "https://cdn-icons-png.flaticon.com/512/4403/4403165.png";
+    }
+    return "https://cdn-icons-png.flaticon.com/512/1664/1664316.png";
+  }
 }
