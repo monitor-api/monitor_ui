@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:monitor_ui/components/card/desktop/desktop_card.dart';
 import 'package:monitor_ui/constants.dart';
-import 'package:monitor_ui/data/api.dart';
+import 'package:monitor_ui/data/health.dart';
+import 'package:monitor_ui/data/info.dart';
 import 'package:monitor_ui/header/desktop/desktop_header.dart';
 import 'package:monitor_ui/responsive.dart';
 import 'package:http/http.dart' as http;
@@ -17,12 +18,13 @@ class DesktopHome extends StatefulWidget {
 }
 
 class _DesktopHomeState extends State<DesktopHome> {
-  final Duration periodicityOfCall = const Duration(seconds: 2);
+  final Duration periodicityOfCall = const Duration(seconds: 10);
 
   late final List<Map<String, dynamic>> envByValue;
   late final List<Timer> timers;
 
-  late Map<String, Api> apis = {};
+  late Map<String, Health> health = {};
+  late Map<String, Info> info = {};
   late Map<String, bool> callByApiName = {};
 
   bool isOnTop = false;
@@ -32,25 +34,43 @@ class _DesktopHomeState extends State<DesktopHome> {
     super.initState();
     List<dynamic> envApis = jsonDecode(const String.fromEnvironment("API", defaultValue: "[]"));
     envByValue = envApis.map((e) => e as Map<String, dynamic>).toList();
-    timers = envByValue.map(toApi).toList();
+    envByValue.forEach(healthCaller);
+    envByValue.forEach(infoCaller);
+    /* PERIODIC CALL */
+    timers = envByValue.map(timerCaller).toList();
   }
 
-  Timer toApi(e) => Timer.periodic(periodicityOfCall, (timer) async {
-    if (callByApiName[e["name"]] ?? false) return;
+  Timer timerCaller(envVar) => Timer.periodic(periodicityOfCall, (timer) async => healthCaller(envVar));
 
-    setState(() => callByApiName[e["name"]] = true);
+  healthCaller(Map<String, dynamic> envVar) async {
+    if (callByApiName[envVar["name"]] ?? false) return;
 
-    String body = (await http.get(Uri.parse(e["path"] + "/health"), headers: { "Accept": "application/json" }).timeout(const Duration(minutes: 10))).body;
+    setState(() => callByApiName[envVar["name"]] = true);
 
-    if (mounted) setState(() => callByApiName[e["name"]] = false);
+    String body = (await http.get(Uri.parse(envVar["path"] + "/health"), headers: { "Accept": "application/json" }).timeout(const Duration(minutes: 10))).body;
 
-    Map<String, dynamic> keyValue = jsonDecode(body);
+    if (mounted) setState(() => callByApiName[envVar["name"]] = false);
+
+    Map<String, dynamic> keyValue = jsonDecode(body) ?? {};
     Map<String, dynamic> componentKeyValue = keyValue["components"] ?? {};
 
     Map<String, String> statusByComponent = { for (var e in componentKeyValue.keys) e : componentKeyValue[e]["status"] } ;
 
-    if (mounted) setState(() => apis[e["name"]] = apiCreator(e, keyValue["status"], statusByComponent));
-  });
+    if (mounted) setState(() => health[envVar["name"]] = apiCreator(envVar, keyValue["status"], statusByComponent));
+  }
+
+  infoCaller(Map<String, dynamic> envVar) async {
+
+    String body = (await http.get(Uri.parse(envVar["path"] + "/info")).timeout(const Duration(minutes: 10))).body;
+
+    Map<String, dynamic> keyValue = jsonDecode(body) ?? {};
+
+    Map<String, dynamic> git = keyValue["git"] ?? {};
+    Map<String, dynamic> commit = git["commit"] ?? {};
+    Map<String, dynamic> build = keyValue["build"] ?? {};
+
+    info[envVar["name"]] = Info(name: build["name"], branch: git["branch"], commit: commit["id"], version: build["version"], group: build["group"]);
+  }
 
   @override void dispose() {
     super.dispose();
@@ -59,7 +79,7 @@ class _DesktopHomeState extends State<DesktopHome> {
 
   void cancelTimers() { for (var element in timers) { element.cancel(); } }
 
-  Api apiCreator(e, String status, Map<String, String> componentKeyValue) => Api(
+  Health apiCreator(e, String status, Map<String, String> componentKeyValue) => Health(
     name: e["name"],
     status: status,
     environment: e["env"],
@@ -123,10 +143,10 @@ class _DesktopHomeState extends State<DesktopHome> {
       return true;
     },
     child: ListView.separated(
-      itemCount: 50,
+      itemCount: health.length,
       itemBuilder: (context, index) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: apis.values.map((e) => sizedContent(context, cardCreator(e))).toList(),
+        children: health.values.map((e) => sizedContent(context, cardCreator(e, info[e.name] ?? Info()))).toList(),
       ),
       separatorBuilder: (BuildContext context, int index) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -135,10 +155,13 @@ class _DesktopHomeState extends State<DesktopHome> {
     ),
   );
 
-  SizedBox sizedContent(BuildContext context, Widget child) => SizedBox(
-    width: Responsive.width(context) / 2.1,
-    child: child,
-  );
+  SizedBox sizedContent(BuildContext context, Widget child) {
+    double width = Responsive.width(context) / 3;
+    return SizedBox(
+      width: width > 400 ? width : 400,
+      child: child,
+    );
+  }
 
   Row floatingActionButton() => Row(
     mainAxisAlignment: MainAxisAlignment.end,
@@ -162,5 +185,5 @@ class _DesktopHomeState extends State<DesktopHome> {
     ),
   );
 
-  DesktopCard cardCreator(Api api) => DesktopCard(name: api.name, status: api.status, environment: api.environment, gitLink: api.gitLink, components: api.components);
+  DesktopCard cardCreator(Health health, Info info) => DesktopCard(health: health, info: info);
 }

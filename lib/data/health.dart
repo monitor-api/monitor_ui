@@ -1,11 +1,11 @@
-class Api {
+class Health {
   final String name;
   final String status;
   final String environment;
   final String gitLink;
   final Map<String, String> components;
 
-  Api({
+  Health({
     required this.name,
     required this.status,
     required this.environment,

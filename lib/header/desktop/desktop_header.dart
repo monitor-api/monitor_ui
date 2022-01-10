@@ -7,14 +7,16 @@ class DesktopHeader extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  @override Widget build(BuildContext context) => Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      SizedBox(
-        //padding: const EdgeInsets.only(top: 10),
-        width: Responsive.width(context) / 2.1,
-        child: const SearchField(),
-      )
-    ],
-  );
+  @override Widget build(BuildContext context) {
+    double width = Responsive.width(context) / 3;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: width > 400 ? width : 400,
+          child: const SearchField(),
+        )
+      ],
+    );
+  }
 }
