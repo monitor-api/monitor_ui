@@ -3,11 +3,10 @@ import 'package:monitor_ui/responsive.dart';
 import 'package:universal_html/html.dart';
 import 'package:flutter/material.dart';
 import 'package:monitor_ui/constants.dart';
-import 'package:monitor_ui/data/enums/status.dart';
 
 class DesktopCard extends StatefulWidget {
   final String name;
-  final Status status;
+  final String status;
   final String environment;
   final String gitLink;
 
@@ -169,11 +168,11 @@ class _DesktopCardState extends State<DesktopCard> {
         height: 25,
         width: 70,
         decoration: BoxDecoration(
-          color: widget.status == Status.up ? success : danger,
+          color: widget.status == "UP" ? success : danger,
           borderRadius: const BorderRadius.all(Radius.circular(10)),
           border: Border.all(color: Colors.white10),
         ),
-        child: Center(child: Text(widget.status.name.toUpperCase())),
+        child: Center(child: Text(widget.status.toUpperCase())),
       ),
     ],
   );

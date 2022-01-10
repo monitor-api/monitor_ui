@@ -1,12 +1,10 @@
-import 'package:monitor_ui/data/enums/status.dart';
-
-class Card {
+class Api {
   final String name;
-  final Status status;
+  final String status;
   final String environment;
   final String gitLink;
 
-  Card({
+  Api({
     required this.name,
     required this.status,
     required this.environment,

@@ -1,21 +1,56 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:monitor_ui/components/card/desktop/desktop_card.dart';
 import 'package:monitor_ui/constants.dart';
-import 'package:monitor_ui/data/enums/status.dart';
+import 'package:monitor_ui/data/api.dart';
 import 'package:monitor_ui/header/desktop/desktop_header.dart';
 import 'package:monitor_ui/responsive.dart';
+import 'package:http/http.dart' as http;
 
 class DesktopHome extends StatefulWidget {
 
   const DesktopHome({Key? key}) : super(key: key);
 
-  @override
-  State<DesktopHome> createState() => _DesktopHomeState();
+  @override State<DesktopHome> createState() => _DesktopHomeState();
 }
 
 class _DesktopHomeState extends State<DesktopHome> {
+  final int responseTimeOfHealth = 30;
+  final Duration periodicityOfCall = const Duration(seconds: 2);
+
+  late final List<Map<String, dynamic>> envByValue;
+
+  late Map<String, Api> apis = {};
+  late Map<String, bool> callByApiName = {};
+
   bool isOnTop = false;
   bool upTopText = false;
+
+  @override void initState() {
+    super.initState();
+    List<dynamic> envApis = jsonDecode(const String.fromEnvironment("API", defaultValue: "[]"));
+    envByValue = envApis.map((e) => e as Map<String, dynamic>).toList();
+    envByValue.forEach(toApi);
+    Timer.periodic(periodicityOfCall, (timer) async => envByValue.forEach(toApi));
+  }
+
+  Future<void> toApi(e) async {
+
+    if (callByApiName[e["name"]] ?? false) return;
+
+    setState(() => callByApiName[e["name"]] = true);
+
+    String body = (await http.get(Uri.parse(e["path"] + "/health"), headers: { "Accept": "application/json" })).body;
+
+    setState(() => callByApiName[e["name"]] = false);
+
+    Map <String, dynamic> keyValue = jsonDecode(body);
+    setState(() {
+      apis[e["name"]] = Api(name: e["name"], status: keyValue["status"], environment: e["env"], gitLink: e["gitLink"]);
+    });
+  }
 
   final ScrollController _controller = ScrollController();
 
@@ -73,10 +108,10 @@ class _DesktopHomeState extends State<DesktopHome> {
       return true;
     },
     child: ListView.separated(
-      itemCount: 50,
+      itemCount: apis.length,
       itemBuilder: (context, index) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [ sizedContent(context, cardCreator()) ],
+        children: apis.values.map((e) => sizedContent(context, cardCreator(e))).toList(),
       ),
       separatorBuilder: (BuildContext context, int index) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -112,5 +147,5 @@ class _DesktopHomeState extends State<DesktopHome> {
     ),
   );
 
-  DesktopCard cardCreator() => const DesktopCard(name: "EmobG", status: Status.up, environment: "DEV2", gitLink: "https://about.gitlab.com/");
+  DesktopCard cardCreator(Api api) => DesktopCard(name: api.name, status: api.status, environment: api.environment, gitLink: api.gitLink);
 }

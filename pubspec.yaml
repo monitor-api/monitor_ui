@@ -30,6 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   universal_html: ^2.0.8
+  http: ^0.13.4
 
   google_fonts: ^2.1.1
   flutter_svg: ^1.0.0

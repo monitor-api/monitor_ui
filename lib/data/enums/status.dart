@@ -1,4 +1,0 @@
-enum Status {
-  down,
-  up
-}
