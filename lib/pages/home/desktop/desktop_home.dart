@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:monitor_ui/components/card/desktop/desktop_card.dart';
 import 'package:monitor_ui/constants.dart';
 import 'package:monitor_ui/data/health.dart';
@@ -29,6 +30,7 @@ class _DesktopHomeState extends State<DesktopHome> {
 
   bool isOnTop = false;
   bool upTopText = false;
+  bool previousStatusUp = true;
 
   @override void initState() {
     super.initState();
@@ -43,27 +45,31 @@ class _DesktopHomeState extends State<DesktopHome> {
   Timer timerCaller(envVar) => Timer.periodic(periodicityOfCall, (timer) async => healthCaller(envVar));
 
   healthCaller(Map<String, dynamic> envVar) async {
+    if (!previousStatusUp) infoCaller(envVar);
+
     String key = "${envVar["name"]}-${envVar["env"]}";
 
     if (callByApiName[key] ?? false) return;
 
     if (mounted) setState(() => callByApiName[key] = true);
 
-    String body = (await http.get(Uri.parse(envVar["path"] + "/health"), headers: { "Accept": "application/json" }).timeout(const Duration(minutes: 10))).body;
+    String body = await getHealth(envVar);
 
     if (mounted) setState(() => callByApiName[key] = false);
 
     Map<String, dynamic> keyValue = jsonDecode(body) ?? {};
     Map<String, dynamic> componentKeyValue = keyValue["components"] ?? {};
 
+    String status = keyValue["status"];
+
     Map<String, String> statusByComponent = { for (var e in componentKeyValue.keys) e : componentKeyValue[e]["status"] } ;
 
-    if (mounted) setState(() => health[key] = apiCreator(envVar, keyValue["status"], statusByComponent));
+    if (mounted) setState(() { health[key] = apiCreator(envVar, status, statusByComponent); previousStatusUp = status == "UP"; });
   }
 
   infoCaller(Map<String, dynamic> envVar) async {
 
-    String body = (await http.get(Uri.parse(envVar["path"] + "/info")).timeout(const Duration(minutes: 10))).body;
+    String body = await getInfo(envVar);
 
     Map<String, dynamic> keyValue = jsonDecode(body) ?? {};
 
@@ -74,6 +80,22 @@ class _DesktopHomeState extends State<DesktopHome> {
     String key = "${envVar["name"]}-${envVar["env"]}";
 
     if (mounted) setState(() => info[key] = Info(name: build["name"], branch: git["branch"], commit: commit["id"], version: build["version"], group: build["group"]));
+  }
+
+  Future<String> getHealth(Map<String, dynamic> envVar) async {
+    try {
+      return (await http.get(Uri.parse(envVar["path"] + "/health"), headers: { "Accept": "application/json"}).timeout(const Duration(minutes: 10))).body;
+    } catch(_) {
+      return "{\"status\": \"DOWN\"}";
+    }
+  }
+
+  Future<String> getInfo(Map<String, dynamic> envVar) async {
+    try {
+      return (await http.get(Uri.parse(envVar["path"] + "/info")).timeout(const Duration(minutes: 10))).body;
+    } catch (_) {
+      return "{}";
+    }
   }
 
   @override void dispose() {
@@ -147,7 +169,7 @@ class _DesktopHomeState extends State<DesktopHome> {
       return true;
     },
     child: ListView.separated(
-      itemCount: 50,
+      itemCount: health.length,
       itemBuilder: (context, index) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: health.values.map((e) => sizedContent(context, cardCreator(e, info["${e.name}-${e.environment}"] ?? Info()))).toList(),
