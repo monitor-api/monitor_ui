@@ -37,8 +37,6 @@ class _DesktopCardState extends State<DesktopCard> {
       ),
       onPressed: () {  },
       child: Column(
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           topSide(),
           heightSpacer,

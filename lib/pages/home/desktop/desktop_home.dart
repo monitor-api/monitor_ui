@@ -18,7 +18,7 @@ class DesktopHome extends StatefulWidget {
 }
 
 class _DesktopHomeState extends State<DesktopHome> {
-  final Duration periodicityOfCall = const Duration(seconds: 10);
+  final Duration periodicityOfCall = const Duration(seconds: 3);
 
   late final List<Map<String, dynamic>> envByValue;
   late final List<Timer> timers;
@@ -43,20 +43,22 @@ class _DesktopHomeState extends State<DesktopHome> {
   Timer timerCaller(envVar) => Timer.periodic(periodicityOfCall, (timer) async => healthCaller(envVar));
 
   healthCaller(Map<String, dynamic> envVar) async {
-    if (callByApiName[envVar["name"]] ?? false) return;
+    String key = "${envVar["name"]}-${envVar["env"]}";
 
-    setState(() => callByApiName[envVar["name"]] = true);
+    if (callByApiName[key] ?? false) return;
+
+    if (mounted) setState(() => callByApiName[key] = true);
 
     String body = (await http.get(Uri.parse(envVar["path"] + "/health"), headers: { "Accept": "application/json" }).timeout(const Duration(minutes: 10))).body;
 
-    if (mounted) setState(() => callByApiName[envVar["name"]] = false);
+    if (mounted) setState(() => callByApiName[key] = false);
 
     Map<String, dynamic> keyValue = jsonDecode(body) ?? {};
     Map<String, dynamic> componentKeyValue = keyValue["components"] ?? {};
 
     Map<String, String> statusByComponent = { for (var e in componentKeyValue.keys) e : componentKeyValue[e]["status"] } ;
 
-    if (mounted) setState(() => health[envVar["name"]] = apiCreator(envVar, keyValue["status"], statusByComponent));
+    if (mounted) setState(() => health[key] = apiCreator(envVar, keyValue["status"], statusByComponent));
   }
 
   infoCaller(Map<String, dynamic> envVar) async {
@@ -69,7 +71,9 @@ class _DesktopHomeState extends State<DesktopHome> {
     Map<String, dynamic> commit = git["commit"] ?? {};
     Map<String, dynamic> build = keyValue["build"] ?? {};
 
-    info[envVar["name"]] = Info(name: build["name"], branch: git["branch"], commit: commit["id"], version: build["version"], group: build["group"]);
+    String key = "${envVar["name"]}-${envVar["env"]}";
+
+    if (mounted) setState(() => info[key] = Info(name: build["name"], branch: git["branch"], commit: commit["id"], version: build["version"], group: build["group"]));
   }
 
   @override void dispose() {
@@ -143,10 +147,10 @@ class _DesktopHomeState extends State<DesktopHome> {
       return true;
     },
     child: ListView.separated(
-      itemCount: health.length,
+      itemCount: 50,
       itemBuilder: (context, index) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: health.values.map((e) => sizedContent(context, cardCreator(e, info[e.name] ?? Info()))).toList(),
+        children: health.values.map((e) => sizedContent(context, cardCreator(e, info["${e.name}-${e.environment}"] ?? Info()))).toList(),
       ),
       separatorBuilder: (BuildContext context, int index) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
